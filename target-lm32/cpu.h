@@ -53,7 +53,10 @@ enum {
     EXCP_DATA_BUS_ERROR,
     EXCP_DIVIDE_BY_ZERO,
     EXCP_IRQ,
-    EXCP_SYSTEMCALL
+    EXCP_SYSTEMCALL,
+    EXCP_ITLB_MISS,
+    EXCP_DTLB_MISS,
+    EXCP_DTLB_FAULT
 };
 
 /* Registers */
@@ -187,6 +190,21 @@ struct CPULM32State {
     /* processor core features */
     uint32_t flags;
 
+#define LM32_PSW_ITLBE  (1<<3)
+#define LM32_PSW_EITLBE (1<<4)
+#define LM32_PSW_DITBLE (1<<5)
+
+#define LM32_PSW_DTLBE  (1<<6)
+#define LM32_PSW_EDTBLE (1<<7)
+#define LM32_PSW_DDTBLE (1<<8)
+
+#define LM32_PSW_UTLBE  (1<<9)
+#define LM32_PSW_EUTLBE (1<<10)
+#define LM32_PSW_DUTLBE (1<<11)
+    uint32_t psw;
+    uint32_t asid;
+    uint32_t itlb[1024];
+    uint32_t dtlb[1024];
 };
 
 typedef enum {

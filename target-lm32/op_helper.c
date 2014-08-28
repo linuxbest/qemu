@@ -158,7 +158,6 @@ uint32_t HELPER(rcsr_badr)(CPULM32State *env)
 
 void HELPER(wcsr_psw)(CPULM32State *env, uint32_t psw)
 {
-    lm32_pic_set_im(env->pic_state, psw & 0x7);
     lm32_mmu_set_psw(env, psw);
 }
 

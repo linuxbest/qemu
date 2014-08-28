@@ -27,9 +27,9 @@
 
 uint32_t lm32_mmu_get_psw(CPULM32State *state, uint32_t ie)
 {
-	LOG_MMU("mmu: read psw %08x\n", ie);
-	/* TODO */
-	return ie;
+	uint32_t psw = state->psw | ie;
+	LOG_MMU("mmu: read psw %08x, ie %08x\n", psw, ie);
+	return psw;
 }
 
 uint32_t lm32_mmu_get_vadr(CPULM32State *state)
@@ -46,10 +46,10 @@ uint32_t lm32_mmu_get_badr(CPULM32State *state)
 	return 0;
 }
 
-void lm32_mmu_set_psw(CPULM32State *state, uint32_t r)
+void lm32_mmu_set_psw(CPULM32State *state, uint32_t psw)
 {
-	LOG_MMU("mmu: write psw %08x\n", r);
-	/* TODO */
+	LOG_MMU("mmu: write psw %08x => %08x\n", state->psw, psw);
+	state->psw = psw;
 }
 
 void lm32_mmu_set_vadr(CPULM32State *state, uint32_t r)
@@ -62,6 +62,14 @@ void lm32_mmu_set_padr(CPULM32State *state, uint32_t r)
 {
 	LOG_MMU("mmu: write padr %08x\n", r);
 	/* TODO */
+}
+
+int lm32_mmu_translate(LM32MMUResult *res, CPULM32State *env, uint32_t vaddr,
+                        int rw, int mmu_idx)
+{
+	LOG_MMU("mmu: translate vadr %08x, rw %d, idx %d\n", vaddr, rw, mmu_idx);
+	res->phy = vaddr;
+	return 0;
 }
 
 #endif

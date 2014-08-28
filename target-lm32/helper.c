@@ -20,24 +20,41 @@
 #include "cpu.h"
 #include "qemu/host-utils.h"
 #include "sysemu/sysemu.h"
+#include "mmu_helper.h"
 
 int lm32_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int rw,
                               int mmu_idx)
 {
     LM32CPU *cpu = LM32_CPU(cs);
     CPULM32State *env = &cpu->env;
-    int prot;
+    target_ulong phy;
+    int prot, r = 0;
 
     address &= TARGET_PAGE_MASK;
+    phy = address;
     prot = PAGE_BITS;
+    if (env->psw & (LM32_PSW_ITLBE | LM32_PSW_DTLBE)) {
+	    int miss;
+	    LM32MMUResult res;
+	    miss = lm32_mmu_translate(&res, env, address, rw, mmu_idx);
+	    if (miss) {
+		    /* TODO handle the miss */
+		    //raise_exception(env, EXCP_ITLB_MISS);
+		    //phy = 0;
+		    r = 1;
+	    } else {
+		    phy = res.phy;
+		    r = 0;
+	    }
+    }
     if (env->flags & LM32_FLAG_IGNORE_MSB) {
-        tlb_set_page(cs, address, address & 0x7fffffff, prot, mmu_idx,
+        tlb_set_page(cs, address, phy & 0x7fffffff, prot, mmu_idx,
                      TARGET_PAGE_SIZE);
     } else {
-        tlb_set_page(cs, address, address, prot, mmu_idx, TARGET_PAGE_SIZE);
+        tlb_set_page(cs, address, phy, prot, mmu_idx, TARGET_PAGE_SIZE);
     }
 
-    return 0;
+    return r;
 }
 
 hwaddr lm32_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
