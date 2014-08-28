@@ -133,6 +133,10 @@ enum {
     CSR_WP1  = 0x19,
     CSR_WP2  = 0x1a,
     CSR_WP3  = 0x1b,
+    CSR_PSW  = 0x1d,
+    TLB_VADR = 0x1e,
+    TLB_PADR = 0x1f,
+    TLB_BADR = 0x1f,
 };
 
 enum {

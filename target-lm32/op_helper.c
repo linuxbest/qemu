@@ -7,6 +7,7 @@
 #include "hw/char/lm32_juart.h"
 
 #include "exec/cpu_ldst.h"
+#include "mmu_helper.h"
 
 #ifndef CONFIG_USER_ONLY
 #include "sysemu/sysemu.h"
@@ -137,6 +138,38 @@ uint32_t HELPER(rcsr_jtx)(CPULM32State *env)
 uint32_t HELPER(rcsr_jrx)(CPULM32State *env)
 {
     return lm32_juart_get_jrx(env->juart_state);
+}
+
+uint32_t HELPER(rcsr_psw)(CPULM32State *env)
+{
+	uint32_t ie = lm32_pic_get_im(env->pic_state);
+	return lm32_mmu_get_psw(env, ie);
+}
+
+uint32_t HELPER(rcsr_vadr)(CPULM32State *env)
+{
+	return lm32_mmu_get_vadr(env);
+}
+
+uint32_t HELPER(rcsr_badr)(CPULM32State *env)
+{
+	return lm32_mmu_get_badr(env);
+}
+
+void HELPER(wcsr_psw)(CPULM32State *env, uint32_t psw)
+{
+    lm32_pic_set_im(env->pic_state, psw & 0x7);
+    lm32_mmu_set_psw(env, psw);
+}
+
+void HELPER(wcsr_vadr)(CPULM32State *env, uint32_t r)
+{
+	lm32_mmu_set_vadr(env, r);
+}
+
+void HELPER(wcsr_padr)(CPULM32State *env, uint32_t r)
+{
+	lm32_mmu_set_padr(env, r);
 }
 
 /* Try to fill the TLB and return an exception if error. If retaddr is

@@ -668,6 +668,15 @@ static void dec_rcsr(DisasContext *dc)
     case CSR_WP3:
         qemu_log_mask(LOG_GUEST_ERROR, "invalid read access csr=%x\n", dc->csr);
         break;
+    case CSR_PSW:
+	gen_helper_rcsr_psw(cpu_R[dc->r2], cpu_env);
+	break;
+    case TLB_VADR:
+	gen_helper_rcsr_vadr(cpu_R[dc->r2], cpu_env);
+	break;
+    case TLB_BADR:
+	gen_helper_rcsr_badr(cpu_R[dc->r2], cpu_env);
+	break;
     default:
         qemu_log_mask(LOG_GUEST_ERROR, "read_csr: unknown csr=%x\n", dc->csr);
         break;
@@ -939,6 +948,15 @@ static void dec_wcsr(DisasContext *dc)
         qemu_log_mask(LOG_GUEST_ERROR, "invalid write access csr=%x\n",
                       dc->csr);
         break;
+    case CSR_PSW:
+	gen_helper_wcsr_psw(cpu_env, cpu_R[dc->r1]);
+	break;
+    case TLB_VADR:
+	gen_helper_wcsr_vadr(cpu_env, cpu_R[dc->r1]);
+	break;
+    case TLB_PADR:
+	gen_helper_wcsr_padr(cpu_env, cpu_R[dc->r1]);
+	break;
     default:
         qemu_log_mask(LOG_GUEST_ERROR, "write_csr: unknown csr=%x\n",
                       dc->csr);
